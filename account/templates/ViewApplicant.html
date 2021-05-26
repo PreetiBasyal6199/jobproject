@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+<style media="screen">
+table.redTable {
+border: 2px solid #A40808;
+background-color: #EEE7DB;
+width: 100%;
+text-align: center;
+border-collapse: collapse;
+}
+table.redTable td, table.redTable th {
+border: 1px solid #AAAAAA;
+padding: 3px 2px;
+}
+table.redTable tbody td {
+font-size: 13px;
+}
+table.redTable tr:nth-child(even) {
+background: #F5C8BF;
+}
+table.redTable thead {
+background: #A40808;
+}
+table.redTable thead th {
+font-size: 19px;
+font-weight: bold;
+color: #FFFFFF;
+text-align: center;
+border-left: 2px solid #A40808;
+}
+table.redTable thead th:first-child {
+border-left: none;
+}
+
+table.redTable tfoot {
+font-size: 13px;
+font-weight: bold;
+color: #FFFFFF;
+background: #A40808;
+}
+table.redTable tfoot td {
+font-size: 13px;
+}
+table.redTable tfoot .links {
+text-align: right;
+}
+table.redTable tfoot .links a{
+display: inline-block;
+background: #FFFFFF;
+color: #A40808;
+padding: 2px 8px;
+border-radius: 5px;
+}
+</style>
+  </head>
+  <body>
+
+    <br>
+    <br>
+    <h3 class="p-3 mb-2 bg-primary text-white" style = 'font-size: 50px;text-align:center;'>List Of All Applicants!</h3>
+{% if qs %}
+<table class="redTable">
+<thead>
+<tr>
+
+<th>Position</th>
+<th>Applicant</th>
+<th>Applied_Date</th>
+    <th>Resume</th>
+</tr>
+</thead>
+</tfoot>
+<tbody>
+{% for x in qs %}
+    <tr>
+      <td>{{x.job}}</td>
+      <td>{{x.user}}</td>
+      <td>{{x.applied_date}}</td>
+      <td>{{x.resume}}</td>
+
+
+
+
+
+
+
+
+
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+{%else%}
+<h1>Have 0 Jobs</h1>
+{%endif%}
+
+
+<br><br><br><br><br><br><br><br><br>
+
+  </body>
+</html>
