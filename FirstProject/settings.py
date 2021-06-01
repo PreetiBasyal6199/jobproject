@@ -27,8 +27,10 @@ SECRET_KEY = 'django-insecure-mvh3&5a7#j)3+f2hi_gsd9b9&gq_$aj=5ws)0kg-09gos*!x6i
 DEBUG = True
 
 ALLOWED_HOSTS = []
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Application definition
 
@@ -59,7 +61,7 @@ ROOT_URLCONF = 'FirstProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

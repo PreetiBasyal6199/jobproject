@@ -51,8 +51,8 @@ class Apply_Job(models.Model):
 
 class Applicant(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name='applicant')
-    job=models.CharField(max_length=80)
-    company=models.CharField(max_length=50)
-    applied_date = models.DateField(default=timezone.now)
-    resume=models.FileField()
-    applied=models.BooleanField(default=False)
+    job=models.CharField(max_length=80,blank=True)
+    company=models.CharField(max_length=50,blank=True)
+    applied_date = models.DateField(default=timezone.now,blank=True)
+    resume=models.FileField(max_length=100)
+    applied=models.BooleanField(default=False,blank=True)

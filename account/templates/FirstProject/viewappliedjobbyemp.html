@@ -55,34 +55,27 @@ border-radius: 5px;
 </style>
   </head>
   <body>
-
+       {% include "FirstProject/navbaremployee.html" %}
     <br>
     <br>
-    <h3 class="p-3 mb-2 bg-primary text-white" style = 'font-size: 50px;text-align:center;'>List Of All Applicants!</h3>
-{% if qs %}
+    <h3 class="p-3 mb-2 bg-primary text-white" style = 'font-size: 50px;text-align:center;'>Jobs Applied By The User !</h3>
+{% if job %}
 <table class="redTable">
 <thead>
 <tr>
-
 <th>Position</th>
-<th>Applicant</th>
+<th>Company</th>
 <th>Applied_Date</th>
-    <th>Resume</th>
+
 </tr>
 </thead>
 </tfoot>
 <tbody>
-{% for x in qs %}
+{% for x in job %}
     <tr>
       <td>{{x.job}}</td>
-      <td>{{x.user}}</td>
+      <td>{{x.company}}</td>
       <td>{{x.applied_date}}</td>
-      <td>{{x.resume}}</td>
-
-
-
-
-
 
 
 
@@ -97,6 +90,8 @@ border-radius: 5px;
 
 
 <br><br><br><br><br><br><br><br><br>
+
+  {% include "FirstProject/footer.html" %}
 
   </body>
 </html>

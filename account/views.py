@@ -2,11 +2,14 @@ from xml.dom.minidom import Document
 
 from django.contrib import auth
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import render, HttpResponseRedirect, HttpResponse, get_object_or_404
 from django.urls import reverse_lazy
+from rest_framework import serializers
+from django.core import serializers
+
 from .forms import EmployeeRegisterForm,LoginForm,EmployerRegisterForm,JobDetailForm,ApplicantForm
 # Create your views here.
 from .models import User,JobDetails,Applicant
@@ -23,12 +26,12 @@ def EmployeeRegisterView(request):
             user.set_password(password)
 
             user.save()
-            return HttpResponseRedirect('/login/')
+            return HttpResponseRedirect('/employeelogin/')
 
         else:
             form=EmployeeRegisterForm
 
-    return render(request, 'register.xhtml', {'form': form})
+    return render(request, 'FirstProject/employeeregister.html', {'form': form})
 
 
 
@@ -48,16 +51,16 @@ def EmployerRegisterView(request):
             user.set_password(password)
 
             user.save()
-            return HttpResponseRedirect('/login/')
+            return HttpResponseRedirect('/employerlogin/')
         else:
 
             return HttpResponse("Please enter valid data")
             form=CompanyRegisterForm
 
-    return render(request, 'companyregister.xhtml', {'form': form})
+    return render(request, 'FirstProject/companyregister.html', {'form': form})
 
 
-def LoginView(request):
+def EmployerLoginView(request):
     fm=LoginForm()
 
     if request.method == 'POST':
@@ -68,20 +71,42 @@ def LoginView(request):
 
             user=authenticate(username=username,password=pswrd)
             if user:
+                if user.role =="employer":
 
-                login(request,user)
-                if user.role =="employee":
+                  login(request,user)
 
-                    return HttpResponseRedirect('/view-job-employee/')
-                else:
-                    return HttpResponseRedirect('/post-job/')
+                  return HttpResponseRedirect('/aftercom-dash/')
             else:
-                return HttpResponse("The user is not registered yet")
+                return HttpResponse("The user is not registered as Employer")
 
     else:
         fm = LoginForm()
 
-    return render(request, 'companylogin.xhtml', {'form': fm})
+    return render(request, 'FirstProject/EmployerLogin.html', {'form': fm})
+
+def EmployeeLoginView(request):
+    fm=LoginForm()
+
+    if request.method == 'POST':
+        fm = LoginForm(data=request.POST)
+        if fm.is_valid():
+            username=fm.cleaned_data['email']
+            pswrd=fm.cleaned_data['password']
+
+            user=authenticate(username=username,password=pswrd)
+            if user:
+                if user.role =="employee":
+
+                  login(request,user)
+
+                  return HttpResponseRedirect('/afteremp-dash')
+            else:
+                return HttpResponse("The user is not registered as Employee")
+
+    else:
+        fm = LoginForm()
+
+    return render(request, 'FirstProject/EmployeeLogin.html', {'form': fm})
 
 
 def CompanyProfile(request):
@@ -109,8 +134,10 @@ def PostJobView(request):
             obj.company_address=address
             obj.save()
             return HttpResponseRedirect('/view-job-company/')
+
+
         form=JobDetailForm()
-    return render(request,'jobform.xhtml',{'form':form})
+    return render(request,'FirstProject/postjob.html',{'form':form})
 
 @login_required(login_url=reverse_lazy('account:login'))
 @user_is_employer
@@ -118,20 +145,21 @@ def ViewJobByCompany(request):
     obj=JobDetails.objects.filter(user_id=request.user.id)
 
 
-    return render(request,'ViewAllJobCom.html',{'obj':obj})
+    return render(request,'FirstProject/ViewAllJobCom.html',{'obj':obj})
 
 
 @login_required(login_url=reverse_lazy('/login/'))
 @user_is_employee
 def ViewJobByEmployee(request):
     obj=JobDetails.objects.all()
-    return render(request,'ViewAllJob.html',{'obj':obj})
+    return render(request,'FirstProject/ViewAllJob.html',{'obj':obj})
 
 
 def ApplyJobView(request,id):
     form = ApplicantForm(request.POST, request.FILES)
-    user = get_object_or_404(User, id=request.user.id)
+
     qs=JobDetails.objects.get(pk=id)
+    user = get_object_or_404(User, id=request.user.id)
 
     applicant=Applicant.objects.filter(user=user,job=qs.position,company=qs.company_name)
     if not applicant:
@@ -142,14 +170,15 @@ def ApplyJobView(request,id):
                 obj=form.save(commit=False)
                 obj.user=user
                 obj.resume=request.FILES['resume']
+
                 obj.job=qs.position
                 obj.company=qs.company_name
-                obj.applied="True"
+                obj.applied=="True"
                 obj.save()
                 return HttpResponseRedirect('/view-ajob-employee/')
-        pi = JobDetails.objects.get(pk=id)
-        form = ApplicantForm(instance=pi)
-        return render(request, 'applyjob.xhtml', {'form': form})
+
+        form = ApplicantForm(instance=qs)
+        return render(request, 'FirstProject/jobform.html', {'form': form})
 
     else:
         return HttpResponse("Already applied for this job")
@@ -159,15 +188,32 @@ def ApplyJobView(request,id):
 def view_job_employee(request):
     user = get_object_or_404(User, id=request.user.id)
     job=Applicant.objects.filter(user=user)
-    return render(request, 'viewappliedjobbyemp.html', {'job': job})
+    return render(request, 'FirstProject/viewappliedjobbyemp.html', {'job': job})
 
 
-def view_applied_jobs(request,id):
+def view_applied_jobs(request):
     user=get_object_or_404(User,id=request.user.id)
     qs=Applicant.objects.filter(company=user.first_name)
-    return render(request,'ViewApplicant.html',{'qs':qs})
+    return render(request,'FirstProject/ViewApplicant.html',{'qs':qs})
+
+def Home(request):
+    return render(request,'FirstProject/index.html')
 
 
+def Employee_Click(request):
+    return render(request,'FirstProject/employeeclick.html')
+
+def Employer_Click(request):
+    return render(request,'FirstProject/EmployerClick.html')
+
+def Employee_Dash(request):
+    return render(request,'FirstProject/employeeafterlogin.html')
+
+def Employer_Dash(request):
+    return render(request,'FirstProject/employerafterlogin.html')
+
+def aboutus_view(request):
+    return render(request,'FirstProject/aboutus.html')
 
 
 
